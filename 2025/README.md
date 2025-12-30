@@ -108,3 +108,60 @@ The solution for task 2 extends on the previous. We only looked at sequences tha
 An issue that occurs here is that we can arrive at some numbers by repeating different sequences. So, for example, we can get `12121212` by repeating `12` four times, but also by repeating `1212` two times. To solve this, we just need to keep track of the already generated numbers.
 
 [Back to top](#table-of-contents)
+
+## Day 3 - Lobby
+
+[Problem Statement](https://adventofcode.com/2025/day/3)
+
+### Task 1
+
+The first task for this day is to find two numbers form the largest two digit number in a sequence of numbers. So, for a sequence `13112` the output would be `32`. We actually need to sum these two digit numbers for multiple sequences, but this is the main problem to solve today.
+
+A brute force solution, and the one I have first thought of, is to track these two digits - `left_digit` and `right_digit`. The two digit number is then calculated as `left_digit * 10 + right_digit`. We go through the array once and at each iteration do the following:
+
+* Check if the current number is higher than the `left_digit`. 
+    * If it is, we use it as the `left_digit` and set the `right_digit` to the next number.
+    * If it is not higher than the `left_digit`, check if it is higher than `right_digit` and set it as the right one if it is.
+
+We replace the left digit only if we are not at the last digit. One way to implement this is with a `while` loop:
+
+```c
+int process_line_task_1(char *line) {
+    int cntr = 1;
+    int left_digit = line[0] - 48, right_digit = line[1] - 48;
+
+    while (cntr < LINE_LENGTH) {
+        int current_digit = line[cntr] - 48;
+        if ((current_digit > left_digit) && (cntr != LINE_LENGTH - 1)) {
+            left_digit = current_digit;
+            right_digit = line[cntr + 1] - 48;
+        }
+        else if (current_digit > right_digit) {
+            right_digit = current_digit;
+        }
+        cntr++;
+    }
+
+    return left_digit * 10 + right_digit;
+}
+```
+
+### Task 2
+
+As with previous day, this is an extension to the Task 1. Except that we need to find a 12 digit number now. The solution from [Task 1](#task-1-2) can be extendend to recursively handle this, but I wanted to see if I can come up with something smarter.
+
+In order to solve this, we will use an array (which I will call `buffer`) to store the largest digits encountered so far (in order). We go through the input line and store the elements in this `buffer`. The elements are stored in ordered maner, and we discard any elements that are lower than the one we are storing.
+
+So, for example, let us imagine that our input is `2142312` and we need to find a three digits number. We initialize the `buffer` with size `3` and loop through the input. The logic is as follows:
+
+1) Input number: `2`; Buffer: empty -> Store the number in `buffer`
+2) Input number: `1`; Buffer: `2` -> Since `1` is smaller than `2`, add it to the end of `buffer`
+3) Input number: `4`; Buffer: `21` -> Since `4` is larger than both `1` and `2`, empty the buffer and store `4`
+4) Input number: `2`; Buffer: `4` -> Add `2` to the `buffer`
+5) Input number: `3`; Buffer: `42` -> Since `3` is larger than `2`, it replaces it. The `buffer` is now `43`
+
+And so forth. As we approach the end of the input array, we need to limit the number of places that can be replaced in the buffer. So, in our example where we are constructing the three digit number, second to last number in input cannot replace the first number in buffer, and last number in input can only replace the last number in buffer.
+
+This solution is linear when solving each line of input, and generalizes well. It can als be used to solve the first task of this day.
+
+[Back to top](#table-of-contents)
