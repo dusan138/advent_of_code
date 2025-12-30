@@ -3,6 +3,7 @@
 ## Table of Contents
 
 * [Day 1 - Secret Entrance](#day-1---secret-entrance)
+* [Day 2 - Gift Shop](#day-2---gift-shop)
 
 ## Day 1 - Secret Entrance
 
@@ -63,3 +64,47 @@ And finally, starting from `0` and going into negative numbers will not be count
 *zero_crosses_count += current_position != 0;
 ```
 
+[Back to top](#table-of-contents)
+
+## Day 2 - Gift Shop
+
+[Problem Statement](https://adventofcode.com/2025/day/2)
+
+### Task 1
+
+The input for this day is a file with ranges of numbers separated by `,`. Our task is to sum all the numbers in these ranges that consist only of some sequence of digits repeated twice (so, `55`, `123123`, `6464`, etc.).
+
+> [!IMPORTANT]
+> A quick check gives us that the largest number in the input data is a 10 digits number. This means that we will probably have to deal with `long` and `long long` numbers to avoid overflow.
+
+A brute force approach to this is pretty easy: we parse the input, split the lines, generate all the numbers in the given ranges, get their string representations and check if the first part of the string is equal to the second part. Pretty easy to do and to write (in `python`, at least). However, the main issue with this approach is that it's really slow if we are dealing with large numbers, which we are. Ideally, we would like to avoid this brute force solution.
+
+One way to do this is to generate the numbers consisting of two repeated sequences and then check if they fall somewhere between the ranges that we are given.
+
+Since the biggest number we have as input is 10 digits long, we only need to check the sequences up to 5 digits and repeat them. We loop through these digits, construct sequences of numbers and then create the numbers with repeated sequences:
+
+```c
+for (int digits = 1; digits <= 5; digits++) {
+        long power_of_10 = powers_of_10[digits];
+        long sequence_end = power_of_10;
+        long sequence_start = power_of_10 / 10;
+
+        if (sequence_start == 0) {
+            sequence_start = 1;
+        }
+
+        for (long seq = sequence_start; seq < sequence_end; seq++) {
+            long number = seq + seq * power_of_10;
+            // Loop through the ranges and check if the number is in one
+            // of them ...
+        }
+}
+```
+
+### Task 2
+
+The solution for task 2 extends on the previous. We only looked at sequences that repeat once. To solve task 2, we extend this soultion to repeat sequences multiple times and then check if they are in the ranges. We do this as many times before the number represented by repeated sequences becomes larger than the largest number in the range.
+
+An issue that occurs here is that we can arrive at some numbers by repeating different sequences. So, for example, we can get `12121212` by repeating `12` four times, but also by repeating `1212` two times. To solve this, we just need to keep track of the already generated numbers.
+
+[Back to top](#table-of-contents)
