@@ -4,6 +4,8 @@
 
 * [Day 1 - Secret Entrance](#day-1---secret-entrance)
 * [Day 2 - Gift Shop](#day-2---gift-shop)
+* [Day 3 - Lobby](#day-3---lobby)
+* [Day 4 - Printing Department](#day-4---printing-department)
 
 ## Day 1 - Secret Entrance
 
@@ -163,5 +165,51 @@ So, for example, let us imagine that our input is `2142312` and we need to find 
 And so forth. As we approach the end of the input array, we need to limit the number of places that can be replaced in the buffer. So, in our example where we are constructing the three digit number, second to last number in input cannot replace the first number in buffer, and last number in input can only replace the last number in buffer.
 
 This solution is linear when solving each line of input, and generalizes well. It can als be used to solve the first task of this day.
+
+[Back to top](#table-of-contents)
+
+## Day 4 - Printing Department
+
+[Problem Statement](https://adventofcode.com/2025/day/4)
+
+### Task 1
+
+The solution for this is pretty straightforward. We loop through the map and, if the current element is `'@'`, check whether the elements around the current one are `'@'`. We implement this checking through `for` loops to avoid hardcoding. We also need to account for some edge cases, but this is, again, pretty straightforward:
+
+```c
+int element_accessible_check(
+    char map[NUM_ROWS][NUM_COLS], int row, int col
+) {
+    char elem = map[row][col];
+    int cntr = 0;
+
+    int start_row, end_row;
+    int start_col, end_col;
+
+    start_row = row == 0 ? 0 : row - 1;
+    end_row = row == NUM_ROWS - 1 ? NUM_ROWS - 1 : row + 1;
+    
+    start_col = col == 0 ? 0 : col - 1;
+    end_col = col == NUM_COLS - 1 ? NUM_COLS - 1 : col + 1;
+
+    for (int n = start_row; n <= end_row; n++) {
+        for (int m = start_col; m <= end_col; m++) {
+            if ((n == row) && (m == col)) {
+                continue;
+            }
+
+            if (map[n][m] == '@') {
+                cntr++;
+            }
+        }
+    }
+
+    return cntr < 4;
+}
+```
+
+### Task 2
+
+The second task requires us to modify the approach slightly. We again pass through the whole map once, but we mark the elements that are accessible. These elements are then removed from the map and replaced with `'.'`. We then repeat the same process until the number of accessible elements has not changed. So, basically, we envelop the Task 1 in a `while` loop.
 
 [Back to top](#table-of-contents)
